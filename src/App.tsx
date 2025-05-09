@@ -1,23 +1,19 @@
-import { useAccount, useIsAuthenticated } from "jazz-react";
-import { AuthButton } from "./AuthButton.tsx";
+import { useAccount } from "jazz-react";
 import { Form } from "./Form.tsx";
 import { Logo } from "./Logo.tsx";
+import { ProfileButton } from "./ProfileButton.tsx";
+
+import "./App.css";
 
 function App() {
   const { me } = useAccount({ resolve: { profile: true, root: true } });
 
-  const isAuthenticated = useIsAuthenticated();
-
   return (
     <>
       <header>
-        <nav className="container flex justify-between items-center py-3">
-          {isAuthenticated ? (
-            <span>You're logged in.</span>
-          ) : (
-            <span>Authenticate to share the data with another device.</span>
-          )}
-          <AuthButton />
+        <nav>
+          <h1>Simple Quiz</h1>
+          <ProfileButton />
         </nav>
       </header>
       <main className="container mt-16 flex flex-col gap-8">

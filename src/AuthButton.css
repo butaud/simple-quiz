@@ -1,0 +1,9 @@
+.auth-button {
+  .buttons {
+    display: flex;
+    justify-content: safe;
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+}

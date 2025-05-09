@@ -7,7 +7,7 @@ import { apiKey } from "./apiKey.ts";
 import { JazzAccount } from "./schema.ts";
 
 // We use this to identify the app in the passkey auth
-export const APPLICATION_NAME = "Jazz starter";
+export const APPLICATION_NAME = "Simple Quiz";
 
 declare module "jazz-react" {
   export interface Register {
@@ -25,5 +25,5 @@ createRoot(document.getElementById("root")!).render(
     >
       <App />
     </JazzProvider>
-  </StrictMode>,
+  </StrictMode>
 );

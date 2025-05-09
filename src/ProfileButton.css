@@ -1,0 +1,110 @@
+button.profile-button {
+  min-width: 50px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--button-foreground);
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+}
+
+.profile-editor-container {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+
+  border-radius: 10px;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  background-color: var(--background-color);
+}
+
+.profile-editor-container button.close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 24px;
+  height: 36px;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+form.profile-editor {
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  /* this isn't really a color, it's more of a filter over what's behind it */
+  background-color: var(--semitransparent);
+}
+
+form.profile-editor input {
+  padding: 5px;
+  font-size: 16px;
+  max-width: 150px;
+  border-radius: 5px;
+  margin-right: 10px;
+  height: 26px;
+}
+
+form.profile-editor button {
+  font-size: 20px;
+}
+
+form.profile-editor .form-line {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+form.profile-editor label {
+  font-weight: bold;
+  text-align: start;
+  margin: 10px 0;
+}
+
+form.profile-editor:first-child {
+  margin-top: 0;
+}
+
+form.profile-editor .color-picker-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 250px;
+}
+
+.color-picker-container button.color {
+  padding: 5px;
+  color: var(--button-foreground);
+  height: 36px;
+  width: 36px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-right: 5px;
+  cursor: pointer;
+
+  border: 3px solid var(--neutral-color);
+  border-style: outset;
+  margin: 5px;
+  box-shadow: 0 4px 8px var(--shadow-color-strong);
+}
+
+.color-picker-container button.color.selected {
+  border: 3px solid var(--background-color);
+  border-style: inset;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  margin: 5px;
+}
