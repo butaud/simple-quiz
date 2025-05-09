@@ -1,5 +1,6 @@
 nav {
   width: 95%;
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   align-items: center;
