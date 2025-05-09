@@ -3,7 +3,13 @@
  * https://jazz.tools/docs/react/schemas/covalues
  */
 
-import { Account, CoMap, Group, Profile, co } from "jazz-tools";
+import { Account, CoList, CoMap, Group, Profile, co } from "jazz-tools";
+
+export class Quiz extends CoMap {
+  title = co.string;
+}
+
+export class ListOfQuizzes extends CoList.Of(co.ref(Quiz)) {}
 
 export const AVATAR_COLORS = [
   "#3D3D3D", // dark gray
@@ -47,7 +53,10 @@ export class JazzProfile extends Profile {
 
 /** The account root is an app-specific per-user private `CoMap`
  *  where you can store top-level objects for that user */
-export class AccountRoot extends CoMap {}
+export class AccountRoot extends CoMap {
+  ownerQuizzes = co.ref(ListOfQuizzes);
+  participantQuizzes = co.ref(ListOfQuizzes);
+}
 
 export class JazzAccount extends Account {
   profile = co.ref(JazzProfile);
@@ -60,7 +69,13 @@ export class JazzAccount extends Account {
     if (this.root === undefined) {
       const group = Group.create();
 
-      this.root = AccountRoot.create({}, group);
+      this.root = AccountRoot.create(
+        {
+          ownerQuizzes: ListOfQuizzes.create([]),
+          participantQuizzes: ListOfQuizzes.create([]),
+        },
+        group
+      );
     }
 
     if (this.profile === undefined) {

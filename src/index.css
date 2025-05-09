@@ -67,6 +67,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--background-color);
   color: var(--font-color);
+
+  width: 95%;
+  margin: 0 auto;
 }
 
 /* button styles */
@@ -80,6 +83,16 @@ button {
   border-image: none;
   border-color: var(--neutral-color-medium);
   cursor: pointer;
+}
+
+input[type="submit"],
+button:disabled {
+  background-color: var(--neutral-color-light);
+  color: var(--neutral-color-strong);
+  cursor: default;
+  box-shadow: none;
+  border-style: inset;
+  border-color: var(--neutral-color);
 }
 
 input[type="submit"]:hover:enabled,
