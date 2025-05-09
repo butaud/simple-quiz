@@ -14,6 +14,7 @@ export function Avatar({ profile, as, onClick, size = "medium" }: AvatarProps) {
   return createElement(
     as,
     {
+      title: profile.name,
       className: `avatar ${size}`,
       style: {
         backgroundColor: profile.color ?? AVATAR_COLORS[0],

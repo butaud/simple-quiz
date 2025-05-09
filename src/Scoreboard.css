@@ -8,8 +8,20 @@
       margin: 10px 0;
     }
 
-    li:first-child .score {
-      font-weight: bold;
+    li:first-child {
+      position: relative;
+      .score {
+        font-weight: bold;
+      }
+
+      .avatar {
+        &::after {
+          content: "👑";
+          position: absolute;
+          top: -20px;
+          font-size: 20px;
+        }
+      }
     }
   }
 }

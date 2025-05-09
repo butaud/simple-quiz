@@ -12,6 +12,10 @@
   border: none;
 }
 
+div.avatar {
+  cursor: default;
+}
+
 .avatar.small {
   min-width: 30px;
   width: 30px;

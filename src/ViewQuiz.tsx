@@ -107,8 +107,6 @@ export const ViewQuiz = () => {
       {quiz.currentLiveSession && !entry?.liveSession && (
         <button onClick={joinLiveSession}>Join Live Session</button>
       )}
-      {entry && <h3>Your answers:</h3>}
-      {entry && entry.answers.length === 0 && <p>No answers submitted yet.</p>}
       {entry && <TakeQuiz entry={entry} quiz={quiz} reset={reset} />}
     </div>
   );

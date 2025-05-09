@@ -25,7 +25,7 @@ export const Scoreboard = ({ liveSession }: ScoreboardProps) => {
     score: calculateScore(entry),
   }));
   const rankedEntries = entriesWithScores.sort((a, b) => {
-    return a.score - b.score;
+    return b.score - a.score;
   });
   return (
     <div className="scoreboard">
@@ -33,7 +33,7 @@ export const Scoreboard = ({ liveSession }: ScoreboardProps) => {
       <ul>
         {rankedEntries.map((entry) => (
           <li key={entry.id} className="scoreboard-entry">
-            <Avatar profile={entry.account.profile} as="div" size="small" /> :{" "}
+            <Avatar profile={entry.account.profile} as="div" size="small" />{" "}
             <span className="score">
               {entry.score} {entry.score === 1 ? "point" : "points"}
             </span>
