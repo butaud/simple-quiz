@@ -46,7 +46,7 @@ export const ViewQuiz = () => {
   }
   if (!me || !quiz) return null;
 
-  const entry = me.root.entries.find((e) => e.quiz.id === id);
+  const entry = me.root.entries.find((e) => e.quiz.id === id && !e.archived);
 
   const createEntry = () => {
     const newEntry = Entry.create({
@@ -65,10 +65,7 @@ export const ViewQuiz = () => {
 
   const reset = () => {
     if (entry) {
-      me.root.entries.splice(
-        me.root.entries.findIndex((e) => e.id === entry.id),
-        1
-      );
+      entry.archived = true;
       createEntry();
     }
   };

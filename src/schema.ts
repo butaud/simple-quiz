@@ -24,6 +24,7 @@ export class Entry extends CoMap {
   quiz = co.ref(Quiz);
   answers = co.ref(ListOfAnswers);
   currentQuestion = co.optional.ref(QuizQuestion);
+  archived = co.optional.boolean;
 
   get currentQuestionIndex() {
     if (!this.currentQuestion) return 0;
