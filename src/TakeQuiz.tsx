@@ -1,23 +1,40 @@
 import { Resolved } from "jazz-tools";
-import { Answer, Entry, Quiz, QuizQuestion } from "./schema";
+import { Answer, Entry, LiveSession, Quiz, QuizQuestion } from "./schema";
 import { useState } from "react";
 
 import "./TakeQuiz.css";
+import { allAnswered, getCurrentQuestion } from "./util/model";
 
 export type TakeQuizProps = {
   quiz: Resolved<Quiz, { questions: { $each: true } }>;
   entry: Resolved<
     Entry,
-    { answers: { $each: { question: true } }; currentQuestion: true }
+    {
+      answers: { $each: { question: true } };
+      currentQuestion: true;
+      liveSession: {
+        answered: { $each: { question: true } };
+        quiz: {
+          questions: { $each: true };
+        };
+      };
+      quiz: {
+        questions: { $each: true };
+      };
+    }
   >;
   reset: () => void;
 };
 
 export const TakeQuiz = ({ quiz, entry, reset }: TakeQuizProps) => {
-  const currentQuestion = quiz.questions[entry.currentQuestionIndex];
-  const allFinished = entry.answers.length === quiz.questions.length;
+  const currentQuestion = entry.liveSession
+    ? getCurrentQuestion(entry.liveSession)
+    : entry.quiz.questions[entry.currentQuestionIndex];
+  const allFinished = entry.liveSession
+    ? allAnswered(entry.liveSession) && !entry.liveSession.showingAnswer
+    : entry.answers.length === quiz.questions.length;
 
-  if (allFinished) {
+  if (allFinished || !currentQuestion) {
     return <QuizFinish entry={entry} quiz={quiz} reset={reset} />;
   }
 
@@ -52,25 +69,43 @@ type QuizTocItemProps = {
   question: Resolved<QuizQuestion, true>;
   entry: Resolved<
     Entry,
-    { answers: { $each: { question: true } }; currentQuestion: true }
+    {
+      answers: { $each: { question: true } };
+      currentQuestion: true;
+      liveSession: {
+        answered: { $each: { question: true } };
+        quiz: {
+          questions: { $each: true };
+        };
+      };
+      quiz: {
+        questions: { $each: true };
+      };
+    }
   >;
 };
 
 export const QuizTocItem = ({ index, question, entry }: QuizTocItemProps) => {
-  const isActive = entry.currentQuestion?.id === question.id;
+  const currentQuestion = entry.liveSession
+    ? getCurrentQuestion(entry.liveSession)
+    : entry.quiz.questions[entry.currentQuestionIndex];
+  const isActive = currentQuestion?.id === question.id;
   const answer = entry.answers.find((a) => a.question.id === question.id);
   const onClick = () => {
     entry.currentQuestion = question;
   };
   let displayText = `${index + 1}`;
-  if (answer) {
+  if (
+    answer &&
+    !(entry.liveSession && isActive && !entry.liveSession.showingAnswer)
+  ) {
     displayText += `: ${
       answer.answer === question.correctAnswer ? "✅" : "❌"
     }`;
   }
   return (
     <li>
-      {isActive ? (
+      {isActive || entry.liveSession ? (
         <span title={question.question}>{displayText}</span>
       ) : (
         <button onClick={onClick} title={question.question} className="subtle">
@@ -83,7 +118,7 @@ export const QuizTocItem = ({ index, question, entry }: QuizTocItemProps) => {
 
 type QuizQuestionCProps = {
   question: Resolved<QuizQuestion, true>;
-  entry: Resolved<Entry, { answers: true }>;
+  entry: Resolved<Entry, { answers: true; liveSession: true }>;
   answer: Resolved<Answer, true> | undefined;
   index: number;
   totalQuestions: number;
@@ -96,67 +131,122 @@ const QuizQuestionC = ({
   index,
   totalQuestions,
 }: QuizQuestionCProps) => {
-  const [newAnswer, setNewAnswer] = useState("");
-
   const isFirstQuestion = index === 0;
   const isLastQuestion = index === totalQuestions - 1;
 
   return (
     <div className="question">
       <h3>{question.question}</h3>
-      {answer && (
-        <p>
-          Your answer: {answer.answer}{" "}
-          {answer.answer === question.correctAnswer ? "✅" : "❌"}
-        </p>
+      {answer || entry.liveSession?.showingAnswer ? (
+        <QuestionAnswerC
+          answer={answer}
+          correctAnswer={question.correctAnswer}
+          liveSession={entry.liveSession}
+        />
+      ) : (
+        <QuestionAnswerEditor entry={entry} question={question} />
       )}
-      {!answer && (
-        <form>
-          <label>
-            Your answer:
-            <input
-              type="text"
-              value={newAnswer}
-              onChange={(e) => setNewAnswer(e.target.value)}
-            />
-          </label>
+      {!entry.liveSession && (
+        <div className="navigation">
           <button
             type="button"
+            disabled={isFirstQuestion}
             onClick={() => {
-              entry.answers.push(
-                Answer.create({
-                  question: question,
-                  answer: newAnswer.trim(),
-                })
-              );
-              setNewAnswer("");
+              entry.currentQuestion = entry.quiz?.questions?.[index - 1];
             }}
           >
-            Submit
+            {"<< Previous"}
           </button>
-        </form>
+          <button
+            type="button"
+            disabled={isLastQuestion}
+            onClick={() => {
+              entry.currentQuestion = entry.quiz?.questions?.[index + 1];
+            }}
+          >
+            {"Next >>"}
+          </button>
+        </div>
       )}
-      <div className="navigation">
-        <button
-          type="button"
-          disabled={isFirstQuestion}
-          onClick={() => {
-            entry.currentQuestion = entry.quiz?.questions?.[index - 1];
-          }}
-        >
-          {"<< Previous"}
-        </button>
-        <button
-          type="button"
-          disabled={isLastQuestion}
-          onClick={() => {
-            entry.currentQuestion = entry.quiz?.questions?.[index + 1];
-          }}
-        >
-          {"Next >>"}
-        </button>
-      </div>
     </div>
+  );
+};
+
+type QuestionAnswerCProps = {
+  answer: Resolved<Answer, true> | undefined;
+  correctAnswer: string;
+  liveSession: LiveSession | undefined;
+};
+
+const QuestionAnswerC = ({
+  answer,
+  correctAnswer,
+  liveSession,
+}: QuestionAnswerCProps) => {
+  if (liveSession?.showingAnswer) {
+    return (
+      <>
+        {answer ? (
+          <p>
+            Your answer: {answer.answer}{" "}
+            {answer.answer === correctAnswer ? "✅" : "❌"}
+          </p>
+        ) : (
+          <p>You didn't answer this question.</p>
+        )}
+        <p>The correct answer was: {correctAnswer}</p>
+      </>
+    );
+  } else if (liveSession && answer) {
+    return <p>Your answer is locked in: {answer.answer}</p>;
+  } else if (answer) {
+    return (
+      <p>
+        Your answer: {answer.answer}{" "}
+        {answer.answer === correctAnswer ? "✅" : "❌"}
+      </p>
+    );
+  }
+};
+
+type QuestionAnswerEditorProps = {
+  entry: Resolved<Entry, { answers: true }>;
+  question: QuizQuestion;
+};
+
+const QuestionAnswerEditor = ({
+  entry,
+  question,
+}: QuestionAnswerEditorProps) => {
+  const [newAnswer, setNewAnswer] = useState("");
+  return (
+    <form onSubmit={(e) => e.preventDefault()}>
+      <label>
+        Your answer:
+        <input
+          type="text"
+          value={newAnswer}
+          onChange={(e) => setNewAnswer(e.target.value)}
+        />
+      </label>
+      <button
+        type="button"
+        onClick={() => {
+          entry.answers.push(
+            Answer.create(
+              {
+                question,
+                answer: newAnswer.trim(),
+              },
+              entry._owner
+            )
+          );
+          setNewAnswer("");
+        }}
+      >
+        Submit
+      </button>
+    </form>
   );
 };
 
@@ -180,13 +270,26 @@ export const QuizFinish = ({ entry, quiz, reset }: QuizFinishProps) => {
       </p>
       <p>Your score: {score.toFixed(2)}%</p>
       <h3>Answers</h3>
-      <ul>
-        {entry.answers.map((answer) => (
-          <li key={answer.question.id}>
-            <strong>{answer.question.question}</strong>: {answer.answer}{" "}
-            {answer.answer === answer.question.correctAnswer ? "✅" : "❌"}
-          </li>
-        ))}
+      <ul className="results">
+        {quiz.questions.map((question) => {
+          const answer = entry.answers.find(
+            (a) => a.question.id === question.id
+          );
+          return (
+            <li key={question.id}>
+              <strong>{question.question}</strong>: {answer?.answer}{" "}
+              {answer ? (
+                answer.answer === answer.question.correctAnswer ? (
+                  "✅"
+                ) : (
+                  "❌"
+                )
+              ) : (
+                <span className="skipped">Skipped</span>
+              )}
+            </li>
+          );
+        })}
       </ul>
       <button type="button" onClick={reset}>
         Take the quiz again

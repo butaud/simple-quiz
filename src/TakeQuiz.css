@@ -41,3 +41,12 @@
     }
   }
 }
+
+.quiz-finish {
+  ul.results {
+    .skipped {
+      color: var(--neutral-color-strong);
+      font-style: italic;
+    }
+  }
+}

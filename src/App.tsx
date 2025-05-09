@@ -3,8 +3,8 @@ import { ProfileButton } from "./ProfileButton.tsx";
 import "./App.css";
 import { Homepage } from "./Homepage.tsx";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import { EditQuiz } from "./EditQuiz.tsx";
 import { ViewQuiz } from "./ViewQuiz.tsx";
+import { ManageQuiz } from "./ManageQuiz.tsx";
 
 function App() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ function App() {
         <Routes>
           <Route index element={<Homepage />} />
           <Route path="/quiz/:id" element={<ViewQuiz />} />
-          <Route path="/quiz/edit/:id" element={<EditQuiz />} />
+          <Route path="/quiz/edit/:id" element={<ManageQuiz />} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </main>

@@ -1,38 +1,20 @@
-import { useNavigate, useParams } from "react-router-dom";
 import "./EditQuiz.css";
-import { useAccount, useCoState } from "jazz-react";
 import { Quiz, QuizQuestion } from "./schema";
-import { ID } from "jazz-tools";
+import { Resolved } from "jazz-tools";
+import { FC } from "react";
 
-export const EditQuiz = () => {
-  const { me } = useAccount({
-    resolve: {
-      root: { ownerQuizzes: { $each: true } },
-    },
-  });
-  const { id } = useParams();
-  const navigate = useNavigate();
+export type EditQuizProps = {
+  quiz: Resolved<Quiz, { questions: { $each: true } }>;
+  onStartLiveSession: () => void;
+};
 
-  const quiz = useCoState(Quiz, id as ID<Quiz>, {
-    resolve: {
-      questions: {
-        $each: true,
-      },
-    },
-  });
-
-  if (!me || !quiz) return null;
-  if (!id) {
-    navigate("/");
-  }
-
-  if (!me.root.ownerQuizzes.some((q) => q.id === id)) {
-    return <p>You don't appear to own this quiz.</p>;
-  }
-
+export const EditQuiz: FC<EditQuizProps> = ({ quiz, onStartLiveSession }) => {
   return (
     <div className="edit-quiz">
       <h2>Edit a Quiz</h2>
+      <button type="button" onClick={onStartLiveSession}>
+        Start Live Session
+      </button>
       <form onSubmit={(e) => e.preventDefault()}>
         <label>
           Quiz Title:

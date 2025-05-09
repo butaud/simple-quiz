@@ -2,7 +2,7 @@ import { useAccount } from "jazz-react";
 import { Group, ID } from "jazz-tools";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ListOfQuizQuestions, Quiz } from "./schema";
+import { ListOfLiveSessions, ListOfQuizQuestions, Quiz } from "./schema";
 
 export const Homepage = () => {
   const { me } = useAccount({
@@ -29,6 +29,7 @@ export const Homepage = () => {
       {
         title: "New quiz",
         questions: ListOfQuizQuestions.create([], allReaderGroup),
+        liveSessions: ListOfLiveSessions.create([], allReaderGroup),
       },
       allReaderGroup
     );

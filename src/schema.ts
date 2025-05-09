@@ -5,6 +5,16 @@
 
 import { Account, CoList, CoMap, Group, Profile, co } from "jazz-tools";
 
+export class LiveSession extends CoMap {
+  quiz = co.ref(Quiz);
+  entries = co.ref(ListOfEntries);
+  answered = co.ref(ListOfQuizQuestions);
+  showingAnswer = co.boolean;
+  startTime = co.Date;
+}
+
+export class ListOfLiveSessions extends CoList.Of(co.ref(LiveSession)) {}
+
 export class QuizQuestion extends CoMap {
   question = co.string;
   correctAnswer = co.string;
@@ -25,6 +35,7 @@ export class Entry extends CoMap {
   answers = co.ref(ListOfAnswers);
   currentQuestion = co.optional.ref(QuizQuestion);
   archived = co.optional.boolean;
+  liveSession = co.optional.ref(LiveSession);
 
   get currentQuestionIndex() {
     if (!this.currentQuestion) return 0;
@@ -41,6 +52,8 @@ export class ListOfEntries extends CoList.Of(co.ref(Entry)) {}
 export class Quiz extends CoMap {
   title = co.string;
   questions = co.ref(ListOfQuizQuestions);
+  liveSessions = co.ref(ListOfLiveSessions);
+  currentLiveSession = co.optional.ref(LiveSession);
 }
 
 export class ListOfQuizzes extends CoList.Of(co.ref(Quiz)) {}
@@ -100,7 +113,7 @@ export class JazzAccount extends Account {
   /** The account migration is run on account creation and on every log-in.
    *  You can use it to set up the account root and any other initial CoValues you need.
    */
-  migrate(this: JazzAccount) {
+  async migrate(this: JazzAccount) {
     if (this.root === undefined) {
       const group = Group.create();
       this.root = AccountRoot.create(
@@ -111,10 +124,29 @@ export class JazzAccount extends Account {
         },
         group
       );
-    } else if (this.root && this.root.entries === undefined) {
-      // If the entries list is not defined, create it
-      const group = Group.create();
-      this.root.entries = ListOfEntries.create([], group);
+    } else if (this.root) {
+      const loadedRoot = await this.root.ensureLoaded({
+        resolve: {
+          entries: true,
+          ownerQuizzes: {
+            $each: {
+              liveSessions: true,
+            },
+          },
+        },
+      });
+      if (loadedRoot.entries === undefined) {
+        // If the entries list is not defined, create it
+        const group = Group.create();
+        this.root.entries = ListOfEntries.create([], group);
+      }
+      loadedRoot.ownerQuizzes.forEach((q) => {
+        if (q.liveSessions === undefined) {
+          const group = Group.create();
+          // If the live sessions list is not defined, create it
+          q.liveSessions = ListOfLiveSessions.create([], group);
+        }
+      });
     }
 
     // If the profile is not defined, create it with a random color

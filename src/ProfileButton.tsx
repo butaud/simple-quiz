@@ -3,6 +3,7 @@ import "./ProfileButton.css";
 import { MdClose } from "react-icons/md";
 import { useAccount } from "jazz-react";
 import { AVATAR_COLORS } from "./schema";
+import { Avatar } from "./Avatar";
 
 export const ProfileButton: FC<{}> = () => {
   const { me } = useAccount();
@@ -14,19 +15,11 @@ export const ProfileButton: FC<{}> = () => {
 
   return (
     <>
-      <button
-        className="profile-button"
-        style={{
-          backgroundColor: me.profile?.color,
-        }}
+      <Avatar
+        profile={me.profile}
+        as="button"
         onClick={() => setExpanded(!expanded)}
-      >
-        {me.profile?.name
-          .split(" ")
-          .slice(0, 2)
-          .map((n: string) => n[0])
-          .join("")}
-      </button>
+      />
       {expanded && <ProfileEditor close={() => setExpanded(false)} />}
     </>
   );
