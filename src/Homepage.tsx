@@ -1,5 +1,6 @@
 import { useAccount } from "jazz-react";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Homepage = () => {
   const { me } = useAccount({
@@ -11,6 +12,8 @@ export const Homepage = () => {
       },
     },
   });
+
+  const navigate = useNavigate();
 
   const [quizId, setQuizId] = useState("");
 
@@ -25,14 +28,14 @@ export const Homepage = () => {
         <ul>
           {me.root.ownerQuizzes.map((quiz) => (
             <li key={quiz.id}>
-              <a href={`/quiz/${quiz.id}`}>{quiz.title}</a>
+              <Link to={`/quiz/edit/${quiz.id}`}>{quiz.title}</Link>
             </li>
           ))}
         </ul>
       )}
       <button
         onClick={() => {
-          window.history.pushState({}, "", "/create");
+          navigate("/create");
         }}
       >
         Create a new quiz
@@ -45,7 +48,7 @@ export const Homepage = () => {
         <ul>
           {me.root.participantQuizzes.map((quiz) => (
             <li key={quiz.id}>
-              <a href={`/quiz/${quiz.id}`}>{quiz.title}</a>
+              <Link to={`/quiz/${quiz.id}`}>{quiz.title}</Link>
             </li>
           ))}
         </ul>
@@ -62,7 +65,7 @@ export const Homepage = () => {
         <button
           disabled={!quizId || quizId.length < 5}
           onClick={() => {
-            window.history.pushState({}, "", `/quiz/${quizId}`);
+            navigate(`/quiz/${quizId}`);
           }}
         >
           Join a quiz

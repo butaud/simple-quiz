@@ -5,6 +5,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { apiKey } from "./apiKey.ts";
 import { JazzAccount } from "./schema.ts";
+import { BrowserRouter } from "react-router-dom";
 
 // We use this to identify the app in the passkey auth
 export const APPLICATION_NAME = "Simple Quiz";
@@ -23,7 +24,9 @@ createRoot(document.getElementById("root")!).render(
       }}
       AccountSchema={JazzAccount}
     >
-      <App />
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <App />
+      </BrowserRouter>
     </JazzProvider>
   </StrictMode>
 );
