@@ -1,6 +1,8 @@
 import { useAccount } from "jazz-react";
+import { Group, ID } from "jazz-tools";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Quiz } from "./schema";
 
 export const Homepage = () => {
   const { me } = useAccount({
@@ -18,6 +20,33 @@ export const Homepage = () => {
   const [quizId, setQuizId] = useState("");
 
   if (!me) return null;
+
+  const createQuiz = () => {
+    const group = Group.create();
+    group.addMember("everyone", "reader");
+    const newQuiz = Quiz.create(
+      {
+        title: "New quiz",
+      },
+      group
+    );
+    me.root.ownerQuizzes.push(newQuiz);
+    navigate(`/quiz/edit/${newQuiz.id}`);
+  };
+
+  const joinQuiz = async () => {
+    const quiz = await Quiz.load(quizId as ID<Quiz>);
+    if (!quiz) {
+      alert("Quiz not found");
+      return;
+    }
+    if (me.root.participantQuizzes.some((q) => q.id === quizId)) {
+      return;
+    }
+    me.root.participantQuizzes.push(quiz);
+    navigate(`/quiz/${quizId}`);
+  };
+
   return (
     <>
       <h2>Quizzes you own</h2>
@@ -33,13 +62,7 @@ export const Homepage = () => {
           ))}
         </ul>
       )}
-      <button
-        onClick={() => {
-          navigate("/create");
-        }}
-      >
-        Create a new quiz
-      </button>
+      <button onClick={createQuiz}>Create a new quiz</button>
       <h2>Quizzes you are participating in</h2>
       {me?.root?.participantQuizzes?.length === 0 && (
         <p>You are not participating in any quizzes yet.</p>
@@ -62,12 +85,7 @@ export const Homepage = () => {
             onChange={(e) => setQuizId(e.target.value)}
           />
         </label>
-        <button
-          disabled={!quizId || quizId.length < 5}
-          onClick={() => {
-            navigate(`/quiz/${quizId}`);
-          }}
-        >
+        <button disabled={!quizId || quizId.length < 5} onClick={joinQuiz}>
           Join a quiz
         </button>
       </form>
