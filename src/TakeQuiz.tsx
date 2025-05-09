@@ -183,7 +183,7 @@ const QuestionAnswerC = ({
   correctAnswer,
   liveSession,
 }: QuestionAnswerCProps) => {
-  if (liveSession?.showingAnswer) {
+  if (liveSession?.showingAnswer || (!liveSession && answer)) {
     return (
       <>
         {answer ? (
@@ -199,13 +199,6 @@ const QuestionAnswerC = ({
     );
   } else if (liveSession && answer) {
     return <p>Your answer is locked in: {answer.answer}</p>;
-  } else if (answer) {
-    return (
-      <p>
-        Your answer: {answer.answer}{" "}
-        {answer.answer === correctAnswer ? "✅" : "❌"}
-      </p>
-    );
   }
 };
 
