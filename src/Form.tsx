@@ -1,4 +1,8 @@
 import { useAccount } from "jazz-react";
+import { FC } from "react";
+import { AVATAR_COLORS } from "./schema";
+
+import "./Form.css";
 
 export function Form() {
   const { me } = useAccount({ resolve: { profile: true, root: true } });
@@ -8,33 +12,52 @@ export function Form() {
   return (
     <div className="grid gap-4 border p-8">
       <div className="flex items-center gap-3">
-        <label htmlFor="firstName" className="sm:w-32">
+        <label htmlFor="name" className="sm:w-32">
           First name
         </label>
         <input
           type="text"
-          id="firstName"
-          placeholder="Enter your first name here..."
+          id="name"
+          placeholder="Enter your name here..."
           className="border border-stone-300 rounded shadow-sm py-1 px-2 flex-1"
-          value={me.profile.firstName || ""}
-          onChange={(e) => (me.profile.firstName = e.target.value)}
+          value={me.profile.name || ""}
+          onChange={(e) => (me.profile.name = e.target.value)}
         />
       </div>
-
       <div className="flex items-center gap-3">
-        <label htmlFor="dateOfBirth" className="sm:w-32">
-          Date of birth
+        <label htmlFor="color" className="sm:w-32">
+          Avatar color
         </label>
-        <input
-          type="date"
-          id="dateOfBirth"
-          className="border border-stone-300 rounded shadow-sm py-1 px-2 flex-1"
-          value={me.root.dateOfBirth?.toISOString().split("T")[0] || ""}
-          onChange={(e) => (me.root.dateOfBirth = new Date(e.target.value))}
-        />
+        <ColorPicker />
       </div>
-
-      {/*Add more fields here*/}
     </div>
   );
 }
+
+const ColorPicker: FC = () => {
+  const { me } = useAccount();
+  return (
+    <div className="color-picker-container">
+      {AVATAR_COLORS.map((color) => {
+        const selected = color === me.profile?.color;
+        const classNames = ["color"];
+        if (selected) {
+          classNames.push("selected");
+        }
+        return (
+          <button
+            key={color}
+            className={classNames.join(" ")}
+            style={{ backgroundColor: color }}
+            type="button"
+            onClick={() => {
+              if (!selected && me.profile) {
+                me.profile.color = color;
+              }
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};

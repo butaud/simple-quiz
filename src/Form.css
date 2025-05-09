@@ -1,0 +1,35 @@
+.color-picker-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 250px;
+}
+
+.color-picker-container button.color {
+  padding: 5px;
+  color: var(--button-foreground);
+  height: 36px;
+  width: 36px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-right: 5px;
+  cursor: pointer;
+  font-size: 20px;
+
+  border: 3px solid var(--neutral-color);
+  border-style: outset;
+  margin: 5px;
+  box-shadow: 0 4px 8px var(--shadow-color-strong);
+}
+
+.color-picker-container button.color.selected {
+  border: 3px solid var(--background-color);
+  border-style: inset;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  margin: 5px;
+}
