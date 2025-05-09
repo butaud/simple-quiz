@@ -10,10 +10,17 @@ export type TakeQuizProps = {
     Entry,
     { answers: { $each: { question: true } }; currentQuestion: true }
   >;
+  reset: () => void;
 };
 
-export const TakeQuiz = ({ quiz, entry }: TakeQuizProps) => {
+export const TakeQuiz = ({ quiz, entry, reset }: TakeQuizProps) => {
   const currentQuestion = quiz.questions[entry.currentQuestionIndex];
+  const allFinished = entry.answers.length === quiz.questions.length;
+
+  if (allFinished) {
+    return <QuizFinish entry={entry} quiz={quiz} reset={reset} />;
+  }
+
   return (
     <div className="take-quiz">
       <div className="toc">
@@ -149,6 +156,41 @@ const QuizQuestionC = ({
           {"Next >>"}
         </button>
       </div>
+    </div>
+  );
+};
+
+type QuizFinishProps = {
+  entry: Resolved<Entry, { answers: { $each: { question: true } } }>;
+  quiz: Resolved<Quiz, { questions: { $each: true } }>;
+  reset: () => void;
+};
+export const QuizFinish = ({ entry, quiz, reset }: QuizFinishProps) => {
+  const correctAnswers = entry.answers.filter(
+    (a) => a.answer === a.question.correctAnswer
+  );
+  const totalQuestions = quiz.questions.length;
+  const score = (correctAnswers.length / totalQuestions) * 100;
+  return (
+    <div className="quiz-finish">
+      <h2>Quiz Finished!</h2>
+      <p>
+        You answered {correctAnswers.length} out of {totalQuestions} questions
+        correctly.
+      </p>
+      <p>Your score: {score.toFixed(2)}%</p>
+      <h3>Answers</h3>
+      <ul>
+        {entry.answers.map((answer) => (
+          <li key={answer.question.id}>
+            <strong>{answer.question.question}</strong>: {answer.answer}{" "}
+            {answer.answer === answer.question.correctAnswer ? "✅" : "❌"}
+          </li>
+        ))}
+      </ul>
+      <button type="button" onClick={reset}>
+        Take the quiz again
+      </button>
     </div>
   );
 };

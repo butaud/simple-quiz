@@ -48,14 +48,28 @@ export const ViewQuiz = () => {
 
   const entry = me.root.entries.find((e) => e.quiz.id === id);
 
+  const createEntry = () => {
+    const newEntry = Entry.create({
+      account: me,
+      quiz: quiz,
+      answers: ListOfAnswers.create([]),
+    });
+    me.root.entries.push(newEntry);
+  };
+
   const takeQuiz = () => {
     if (!entry) {
-      const newEntry = Entry.create({
-        account: me,
-        quiz: quiz,
-        answers: ListOfAnswers.create([]),
-      });
-      me.root.entries.push(newEntry);
+      createEntry();
+    }
+  };
+
+  const reset = () => {
+    if (entry) {
+      me.root.entries.splice(
+        me.root.entries.findIndex((e) => e.id === entry.id),
+        1
+      );
+      createEntry();
     }
   };
 
@@ -63,7 +77,7 @@ export const ViewQuiz = () => {
     <div className="view-quiz">
       <h2>{quiz.title}</h2>
       {!entry && <button onClick={takeQuiz}>Take Quiz</button>}
-      {entry && <TakeQuiz entry={entry} quiz={quiz} />}
+      {entry && <TakeQuiz entry={entry} quiz={quiz} reset={reset} />}
     </div>
   );
 };
