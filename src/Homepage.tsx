@@ -40,10 +40,9 @@ export const Homepage = () => {
       alert("Quiz not found");
       return;
     }
-    if (me.root.participantQuizzes.some((q) => q.id === quizId)) {
-      return;
+    if (!me.root.participantQuizzes.some((q) => q.id === quizId)) {
+      me.root.participantQuizzes.push(quiz);
     }
-    me.root.participantQuizzes.push(quiz);
     navigate(`/quiz/${quizId}`);
   };
 
