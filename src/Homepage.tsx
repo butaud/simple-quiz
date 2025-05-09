@@ -22,14 +22,15 @@ export const Homepage = () => {
   if (!me) return null;
 
   const createQuiz = () => {
-    const group = Group.create();
-    group.addMember("everyone", "reader");
+    const allReaderGroup = Group.create();
+    allReaderGroup.addMember("everyone", "reader");
+    // Create a new quiz with an empty list of questions
     const newQuiz = Quiz.create(
       {
         title: "New quiz",
-        questions: ListOfQuizQuestions.create([], group),
+        questions: ListOfQuizQuestions.create([], allReaderGroup),
       },
-      group
+      allReaderGroup
     );
     me.root.ownerQuizzes.push(newQuiz);
     navigate(`/quiz/edit/${newQuiz.id}`);

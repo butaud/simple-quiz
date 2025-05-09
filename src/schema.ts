@@ -12,6 +12,31 @@ export class QuizQuestion extends CoMap {
 
 export class ListOfQuizQuestions extends CoList.Of(co.ref(QuizQuestion)) {}
 
+export class Answer extends CoMap {
+  question = co.ref(QuizQuestion);
+  answer = co.string;
+}
+
+export class ListOfAnswers extends CoList.Of(co.ref(Answer)) {}
+
+export class Entry extends CoMap {
+  account = co.ref(JazzAccount);
+  quiz = co.ref(Quiz);
+  answers = co.ref(ListOfAnswers);
+  currentQuestion = co.optional.ref(QuizQuestion);
+
+  get currentQuestionIndex() {
+    if (!this.currentQuestion) return 0;
+    const index =
+      this.quiz?.questions?.findIndex(
+        (q) => q?.id === this.currentQuestion?.id
+      ) ?? 0;
+    return index === -1 ? 0 : index;
+  }
+}
+
+export class ListOfEntries extends CoList.Of(co.ref(Entry)) {}
+
 export class Quiz extends CoMap {
   title = co.string;
   questions = co.ref(ListOfQuizQuestions);
@@ -64,6 +89,7 @@ export class JazzProfile extends Profile {
 export class AccountRoot extends CoMap {
   ownerQuizzes = co.ref(ListOfQuizzes);
   participantQuizzes = co.ref(ListOfQuizzes);
+  entries = co.ref(ListOfEntries);
 }
 
 export class JazzAccount extends Account {
@@ -76,15 +102,21 @@ export class JazzAccount extends Account {
   migrate(this: JazzAccount) {
     if (this.root === undefined) {
       const group = Group.create();
-
       this.root = AccountRoot.create(
         {
           ownerQuizzes: ListOfQuizzes.create([]),
           participantQuizzes: ListOfQuizzes.create([]),
+          entries: ListOfEntries.create([], group),
         },
         group
       );
+    } else if (this.root && this.root.entries === undefined) {
+      // If the entries list is not defined, create it
+      const group = Group.create();
+      this.root.entries = ListOfEntries.create([], group);
     }
+
+    // If the profile is not defined, create it with a random color
 
     if (this.profile === undefined) {
       const group = Group.create();

@@ -1,20 +1,30 @@
 import { useNavigate, useParams } from "react-router-dom";
 import "./EditQuiz.css";
 import { useAccount, useCoState } from "jazz-react";
-import { Quiz } from "./schema";
+import { Entry, ListOfAnswers, Quiz } from "./schema";
 import { ID } from "jazz-tools";
 import { useEffect } from "react";
+import { TakeQuiz } from "./TakeQuiz";
 
 export const ViewQuiz = () => {
   const { me } = useAccount({
     resolve: {
-      root: { participantQuizzes: { $each: true } },
+      root: {
+        participantQuizzes: { $each: true },
+        entries: {
+          $each: {
+            quiz: true,
+            answers: { $each: { question: true } },
+            currentQuestion: true,
+          },
+        },
+      },
     },
   });
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const quiz = useCoState<Quiz>(Quiz, id as ID<Quiz>, {
+  const quiz = useCoState(Quiz, id as ID<Quiz>, {
     resolve: {
       questions: {
         $each: true,
@@ -22,20 +32,38 @@ export const ViewQuiz = () => {
     },
   });
 
+  useEffect(() => {
+    if (
+      quiz &&
+      me?.root.participantQuizzes.some((q) => q.id === id) === false
+    ) {
+      me.root.participantQuizzes.push(quiz);
+    }
+  }, [me, quiz, id]);
+
   if (!id) {
     navigate("/");
   }
   if (!me || !quiz) return null;
 
-  useEffect(() => {
-    if (!me.root.participantQuizzes.some((q) => q.id === id)) {
-      me.root.participantQuizzes.push(quiz);
+  const entry = me.root.entries.find((e) => e.quiz.id === id);
+
+  const takeQuiz = () => {
+    if (!entry) {
+      const newEntry = Entry.create({
+        account: me,
+        quiz: quiz,
+        answers: ListOfAnswers.create([]),
+      });
+      me.root.entries.push(newEntry);
     }
-  }, [me, quiz, id]);
+  };
 
   return (
     <div className="view-quiz">
       <h2>{quiz.title}</h2>
+      {!entry && <button onClick={takeQuiz}>Take Quiz</button>}
+      {entry && <TakeQuiz entry={entry} quiz={quiz} />}
     </div>
   );
 };
