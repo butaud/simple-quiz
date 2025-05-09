@@ -230,7 +230,6 @@ const QuestionAnswerEditor = ({
         />
       </label>
       <button
-        type="button"
         onClick={() => {
           entry.answers.push(
             Answer.create(
