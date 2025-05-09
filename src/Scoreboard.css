@@ -8,12 +8,14 @@
       margin: 10px 0;
     }
 
-    li:first-child {
+    li.winner {
       position: relative;
       .score {
         font-weight: bold;
       }
+    }
 
+    li.winner.final {
       .avatar {
         &::after {
           content: "👑";

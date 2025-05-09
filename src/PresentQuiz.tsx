@@ -42,7 +42,7 @@ export const PresentQuiz = ({ liveSession }: PresentQuizProps) => {
     return (
       <>
         <h3>Results</h3>
-        <Scoreboard liveSession={liveSession} />
+        <Scoreboard liveSession={liveSession} final />
       </>
     );
   }

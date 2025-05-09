@@ -17,9 +17,10 @@ export type ScoreboardProps = {
       };
     }
   >;
+  final?: boolean;
 };
 
-export const Scoreboard = ({ liveSession }: ScoreboardProps) => {
+export const Scoreboard = ({ liveSession, final }: ScoreboardProps) => {
   const entriesWithScores = liveSession.entries.map((entry) => ({
     ...entry,
     score: calculateScore(entry),
@@ -27,12 +28,18 @@ export const Scoreboard = ({ liveSession }: ScoreboardProps) => {
   const rankedEntries = entriesWithScores.sort((a, b) => {
     return b.score - a.score;
   });
+  const winningScore = rankedEntries[0]?.score;
   return (
     <div className="scoreboard">
       <h3>Scoreboard</h3>
       <ul>
         {rankedEntries.map((entry) => (
-          <li key={entry.id} className="scoreboard-entry">
+          <li
+            key={entry.id}
+            className={`scoreboard-entry ${final ? "final" : ""} ${
+              entry.score === winningScore ? "winner" : ""
+            }`}
+          >
             <Avatar profile={entry.account.profile} as="div" size="small" />{" "}
             <span className="score">
               {entry.score} {entry.score === 1 ? "point" : "points"}
