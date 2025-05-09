@@ -2,7 +2,7 @@ import { useAccount } from "jazz-react";
 import { Group, ID } from "jazz-tools";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Quiz } from "./schema";
+import { ListOfQuizQuestions, Quiz } from "./schema";
 
 export const Homepage = () => {
   const { me } = useAccount({
@@ -27,6 +27,7 @@ export const Homepage = () => {
     const newQuiz = Quiz.create(
       {
         title: "New quiz",
+        questions: ListOfQuizQuestions.create([], group),
       },
       group
     );

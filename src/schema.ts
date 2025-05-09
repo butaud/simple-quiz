@@ -5,8 +5,16 @@
 
 import { Account, CoList, CoMap, Group, Profile, co } from "jazz-tools";
 
+export class QuizQuestion extends CoMap {
+  question = co.string;
+  correctAnswer = co.string;
+}
+
+export class ListOfQuizQuestions extends CoList.Of(co.ref(QuizQuestion)) {}
+
 export class Quiz extends CoMap {
   title = co.string;
+  questions = co.ref(ListOfQuizQuestions);
 }
 
 export class ListOfQuizzes extends CoList.Of(co.ref(Quiz)) {}

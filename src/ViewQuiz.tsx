@@ -16,7 +16,9 @@ export const ViewQuiz = () => {
 
   const quiz = useCoState<Quiz>(Quiz, id as ID<Quiz>, {
     resolve: {
-      title: true,
+      questions: {
+        $each: true,
+      },
     },
   });
 
